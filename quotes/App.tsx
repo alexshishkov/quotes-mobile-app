@@ -1,49 +1,72 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, SafeAreaView, ImageBackground } from 'react-native';
+import React, { useCallback, useEffect } from 'react'
+import { StyleSheet, SafeAreaView, ImageBackground, ActivityIndicator } from 'react-native';
 import * as Font from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import Footer from './components/footer';
 import Header from './components/header';
 import Main from './components/main';
 import { useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import * as SplashScreen from 'expo-splash-screen';
+import loading from './store/preLoader';
+import quotes from './store/quotes';
+import ServerErrors from './components/serverError';
+import { gStyles } from './globalStyle';
 
-const fonts = () => Font.loadAsync({
-  'font': require('./assets/fonts/ShantellSans-Regular.ttf')
-})
+SplashScreen.preventAutoHideAsync();
 
-const App = () => {
+const App = observer(() => {
   const [isReady, setIsReady] = useState(false);
+  const { getQuotes, serverErrors } = quotes;
 
-  if (isReady) {
+  useEffect(() => {
+    async function prepare() {
+      await Font.loadAsync({
+        'font': require('./assets/fonts/ShantellSans-Regular.ttf')
+      })
+      await SplashScreen.preventAutoHideAsync();
+      setIsReady(true);
+    }
+    prepare();
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (isReady) {
+      await SplashScreen.hideAsync();
+      await getQuotes()
+    }
+  }, [isReady]);
+
+  if (!isReady) {
+    return null;
+  }
     return (
-      <SafeAreaView>
+      <SafeAreaView onLayout={onLayoutRootView}>
         <ImageBackground source={require('./assets/img/bg.jpg')}
           resizeMode="cover"
           style={styles.image}
         >
-          <Header />
-          <Main />
+          <Header getQuotes={getQuotes} />
+          {serverErrors ? <ServerErrors /> :
+            loading.loading
+              ?
+              <ActivityIndicator style={gStyles.loader} animating={true} size={60} color={'#4f8fd8'} />
+              :
+              <Main getQuotes={getQuotes} />
+          }
           <Footer />
         </ImageBackground>
         <StatusBar style="auto" />
       </SafeAreaView>
-    );
-  } else {
-    return <AppLoading startAsync={fonts} onFinish={() => setIsReady(true)}  onError={console.warn}/>
-  }
-}
+    )
+})
 
 const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
   },
-});
-
-export const gStyles = StyleSheet.create({
-  text: {
-    fontFamily: 'font'
-  }
 });
 
 export default App;

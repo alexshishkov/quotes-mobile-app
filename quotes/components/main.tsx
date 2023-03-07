@@ -1,15 +1,25 @@
-import { SafeAreaView, StyleSheet, Text, Pressable, StatusBar, View } from 'react-native';
-import { gStyles } from '../App';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { gStyles } from '../globalStyle';
+import quotes from '../store/quotes';
 
-const Main = () => {
+interface IProps {
+  getQuotes: () => Promise<void>
+}
+
+const Main = (props: IProps) => {
+  const { t } = useTranslation();
+  const { getQuotes } = props;
+  const { quoteText, quoteAuthor } = quotes.quotes;
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={[gStyles.text, styles.quotes, styles.textColor]}>"Ты можешь сказать, что у тебя плохая генетика, плохой обмен веществ, а можешь просто поднять свою задницу с дивана и начать работать над собой, задаться целью и верить в себя",</Text>
+      <View style={styles.quotesWrapper}><Text style={[gStyles.text, styles.quotes, styles.textColor]}>{quoteText}</Text></View>
       <View style={styles.wrap}>
-        <Text style={[gStyles.text, styles.autor, styles.textColor]}>Конфуций</Text>
-        <Pressable style={styles.newQuotes}>
-          <Text style={[gStyles.text, styles.button, styles.textColor]}>Новая цитата</Text>
-        </Pressable>
+        <Text style={[gStyles.text, styles.autor, styles.textColor]}>{quoteAuthor}</Text>
+        <TouchableOpacity style={styles.newQuotes} onPress={getQuotes} >
+          <Text style={[gStyles.text, styles.button, styles.textColor]}>{t(`new-quote`)}</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -24,13 +34,14 @@ const styles = StyleSheet.create({
   textColor: {
     color: 'white',
   },
-  quotes: {
-    flex: 1,
+  quotesWrapper: {
     width: '90%',
-    height: '100%',
-    fontSize: 27,
-    marginTop: 20,
-    backgroundColor: 'black',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quotes: {
+    fontSize: 22,
   },
   wrap: {
     width: '90%',
@@ -44,16 +55,16 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderRadius: 5,
     borderColor: 'white',
-    padding: 10,
+    padding: 5,
     marginTop: 30,
     marginLeft: '25%',
     marginRight: '25%',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   button: {
     fontSize: 20,
     textAlign: 'center',
-  }
+  },
 });
 
 export default Main;

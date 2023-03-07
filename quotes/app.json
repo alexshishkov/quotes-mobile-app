@@ -15,16 +15,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aleksejshishkov.quotes"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/img/quoteStart.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.aleksejshishkov.quotes"
     },
     "web": {
       "favicon": "./assets/img/quoteStart.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a256d9f1-9c4a-4601-9ce2-dd247b1fade0"
+      }
     }
   }
 }
